@@ -1,0 +1,4 @@
+<x-admin-layout>
+    <div class="mb-8"><p class="text-sm font-medium text-slate-500">Overview</p><h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1><p class="mt-2 text-slate-500">Welcome back. Here is what is happening today.</p></div>
+    <div class="grid gap-5 sm:grid-cols-2"><div class="admin-card p-6"><p class="text-sm font-medium text-slate-500">Customer accounts</p><p class="mt-3 text-3xl font-bold text-slate-900">{{ \App\Models\Customer::count() }}</p><a href="{{ route('admin.customers') }}" class="mt-5 inline-block text-sm font-semibold text-slate-700">View customers</a></div><div class="admin-card p-6"><p class="text-sm font-medium text-slate-500">Login activity</p><p class="mt-3 text-3xl font-bold text-slate-900">{{ \App\Models\LoginLog::count() }}</p><a href="{{ route('admin.login-logs') }}" class="mt-5 inline-block text-sm font-semibold text-slate-700">View logs</a></div></div>
+</x-admin-layout>

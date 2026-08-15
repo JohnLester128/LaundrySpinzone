@@ -14,5 +14,8 @@ class Customer extends Authenticatable
     protected $fillable = [
         'username',
         'password',
+        'branch_id',
     ];
+
+    public function branch() { return $this->belongsTo(Branch::class); }
 }

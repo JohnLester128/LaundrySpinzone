@@ -1,14 +1,1 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Customer Login</title>@vite(['resources/css/app.css', 'resources/js/app.js'])</head><body><div class="flex min-h-screen items-center justify-center bg-slate-50 px-5"><div class="admin-card w-full max-w-md p-8"><h1 class="text-2xl font-bold text-slate-900">Welcome back</h1><p class="mt-2 text-sm text-slate-500">Sign in to your LaundrySpinzone account.</p>
-
-<x-notification />
-
-<form action="{{ route('customer.login.store') }}" method="POST">
-    @csrf
-
-    <label class="mt-6 block text-sm font-medium text-slate-700">Username<input class="admin-input" type="text" name="username" value="{{ old('username') }}"></label>
-
-    <label class="mt-4 block text-sm font-medium text-slate-700">Password<input class="admin-input" type="password" name="password"></label>
-
-    <button class="admin-button mt-6 w-full" type="submit">Sign in</button>
-</form>
-</div></div></body></html>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Login</title>@vite(['resources/css/app.css','resources/js/app.js'])</head><body class="min-h-screen bg-[#f4f8ff] text-slate-800"><main class="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-6 text-center"><div class="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-2xl text-white">✦</div><h1 class="mt-4 text-2xl font-bold">Spinzone Laundry</h1>@if($branch)<div class="mt-4 rounded-full bg-white px-4 py-2 text-sm shadow-sm">⌖ Selected Branch: <span class="font-semibold text-blue-600">{{ $branch->name }}</span></div>@endif<div class="mt-16 w-full"><h2 class="text-2xl font-medium">Welcome!</h2><p class="mt-2 text-slate-500">Sign in to access your account.</p><x-notification /><form class="mt-8" action="{{ route('customer.login.store') }}" method="POST">@csrf<input class="customer-input" type="text" name="username" placeholder="Username" value="{{ old('username') }}" required><input class="customer-input mt-3" type="password" name="password" placeholder="Password" required><button class="customer-button mt-5 w-full" type="submit">Login</button></form><a class="mt-4 block rounded-2xl border-2 border-blue-600 px-5 py-3.5 font-semibold text-blue-600" href="{{ route('customer.register') }}">Create Account</a></div></main></body></html>

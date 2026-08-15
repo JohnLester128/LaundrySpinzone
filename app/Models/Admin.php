@@ -14,5 +14,7 @@ class Admin extends Authenticatable
     protected $fillable = [
         'username',
         'password',
+        'branch_id', 'role',
     ];
+    public function branch() { return $this->belongsTo(Branch::class); }
 }

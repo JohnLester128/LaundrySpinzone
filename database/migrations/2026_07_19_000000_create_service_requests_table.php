@@ -11,9 +11,10 @@ return new class extends Migration
         Schema::create('service_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->restrictOnDelete();
+            $table->foreignId('branch_id')->constrained()->restrictOnDelete();
             $table->foreignId('admin_id')->nullable()->constrained('admins')->nullOnDelete();
-            $table->unsignedBigInteger('cloth_type_id')->nullable()->index();
-            $table->unsignedBigInteger('pricing_tier_id')->nullable()->index();
+            $table->foreignId('cloth_type_id')->constrained()->restrictOnDelete();
+            $table->foreignId('pricing_tier_id')->constrained()->restrictOnDelete();
 
             $table->decimal('estimated_weight', 8, 1)->nullable();
             $table->decimal('actual_weight', 8, 1)->nullable();

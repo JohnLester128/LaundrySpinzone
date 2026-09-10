@@ -27,6 +27,8 @@ class ServiceRequest extends Model
         'accepted_by',
         'washing_machine_id',
         'dryer_machine_id',
+        'weight_verification_status',
+        'verification_note',
     ];
 
     protected function casts(): array

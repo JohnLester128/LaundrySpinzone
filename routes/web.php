@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AdminController;
 
-Route::get('/', [CustomerController::class, 'chooseBranch'])->name('home');
+Route::get('/', [CustomerController::class, 'home'])->name('home');
+Route::get('/customer/choose-branch', [CustomerController::class, 'chooseBranch'])->name('customer.choose-branch');
 Route::post('/branch/select', [CustomerController::class, 'selectBranch'])->name('branch.select');
 
 Route::get('/customer/register', [CustomerController::class, 'showRegister'])->name('customer.register');
@@ -17,13 +17,16 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/customer/dashboard', [CustomerController::class, 'dashboard'])->name('customer.dashboard');
     Route::get('/customer/requests', [CustomerController::class, 'requests'])->name('customer.requests');
     Route::get('/customer/requests/{serviceRequest}', [CustomerController::class, 'showRequest'])->name('customer.requests.show');
+    Route::get('/customer/about', [CustomerController::class, 'about'])->name('customer.about');
     Route::post('/customer/logout', [CustomerController::class, 'logout'])->name('customer.logout');
     Route::get('/customer/service-requests/create', [CustomerController::class, 'createServiceRequest'])->name('customer.service-requests.create');
     Route::get('/customer/service-requests', [CustomerController::class, 'createServiceRequest'])->name('customer.service-requests');
     Route::post('/customer/service-requests', [CustomerController::class, 'storeServiceRequest'])->name('customer.service-requests.store');
+    Route::get('/customer/profile', [CustomerController::class, 'profile'])->name('customer.profile');
+    Route::post('/customer/profile', [CustomerController::class, 'updateProfile'])->name('customer.profile.update');
+    Route::post('/customer/profile/password', [CustomerController::class, 'updatePassword'])->name('customer.password.update');
+    Route::post('/customer/profile/branch', [CustomerController::class, 'updateBranch'])->name('customer.branch.update');
 });
-
-use App\Http\Controllers\AdminController;
 
 Route::get('/admin/register', [AdminController::class, 'showRegister'])->name('admin.register');
 Route::post('/admin/register', [AdminController::class, 'register'])->name('admin.register.store');
@@ -45,14 +48,13 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/service-requests/{serviceRequest}/details', [AdminController::class, 'updateServiceRequestDetails'])->name('admin.service-requests.details');
     Route::get('/admin/machines', [AdminController::class, 'machines'])->name('admin.machines');
     Route::post('/admin/machines', [AdminController::class, 'storeMachine'])->name('admin.machines.store');
+    Route::put('/admin/machines/{machine}', [AdminController::class, 'updateMachine'])->name('admin.machines.update');
+    Route::delete('/admin/machines/{machine}', [AdminController::class, 'destroyMachine'])->name('admin.machines.destroy');
+    Route::post('/admin/machines/{machine}/toggle-status', [AdminController::class, 'toggleMachineStatus'])->name('admin.machines.toggle-status');
     Route::get('/admin/sales', [AdminController::class, 'sales'])->name('admin.sales');
+    Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
+    Route::post('/admin/profile/password', [AdminController::class, 'updatePassword'])->name('admin.password.update');
+    Route::post('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+    Route::get('/admin/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::post('/admin/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
 });
-// Inside auth:customer group
-Route::get('/customer/profile', [CustomerController::class, 'profile'])->name('customer.profile');
-Route::post('/customer/profile/password', [CustomerController::class, 'updatePassword'])->name('customer.password.update');
-Route::post('/customer/profile/branch', [CustomerController::class, 'updateBranch'])->name('customer.branch.update');
-
-// Inside auth:admin group
-Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
-Route::post('/admin/profile/password', [AdminController::class, 'updatePassword'])->name('admin.password.update');
-Route::post('/admin/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');

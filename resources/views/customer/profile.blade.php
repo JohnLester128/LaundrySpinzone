@@ -145,34 +145,110 @@
                         </div>
                     </form>
                 </div>
+
+                <!-- SECURITY QUESTION SUBSECTION (Clickable Accordion) -->
+                <div id="securityQuestionSection" class="mt-4 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="toggleSecurityQuestionForm()" class="w-full flex items-center justify-between group cursor-pointer text-left focus:outline-none p-2 -mx-2 rounded-2xl hover:bg-slate-50 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 shadow-2xs group-hover:bg-indigo-200 transition">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold tracking-tight text-slate-900 group-hover:text-indigo-700 transition">Account Recovery Question</h3>
+                                    @if($customerUser->security_question)
+                                        <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Configured</span>
+                                    @else
+                                        <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Not Set</span>
+                                    @endif
+                                </div>
+                                <p class="text-xs text-slate-400">
+                                    {{ $customerUser->security_question ?: 'Set a security question so you can reset your password if you forget it.' }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <svg id="securityQuestionToggleIcon" class="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </button>
+
+                    <!-- Update Security Question Form (Hidden by default) -->
+                    <form id="securityQuestionForm" action="{{ route('customer.security-question.update') }}" method="POST" class="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/30 p-5 hidden transition-all space-y-4">
+                        @csrf
+                        <div>
+                            <label for="profileSecurityQuestion" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                Security Question
+                            </label>
+                            <select id="profileSecurityQuestion" name="security_question" required class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 font-semibold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition cursor-pointer">
+                                <option value="" disabled {{ old('security_question', $customerUser->security_question) ? '' : 'selected' }}>Select a security question...</option>
+                                @foreach(($securityQuestions ?? \App\Models\Customer::SECURITY_QUESTIONS) as $question)
+                                    <option value="{{ $question }}" @selected(old('security_question', $customerUser->security_question) === $question)>
+                                        {{ $question }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="profileSecurityAnswer" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                    New Security Answer
+                                </label>
+                                <input type="text" id="profileSecurityAnswer" name="security_answer" required autocomplete="off" placeholder="Enter your answer" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label for="currentPasswordForSecurity" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                    Current Password (To Confirm)
+                                </label>
+                                <input type="password" id="currentPasswordForSecurity" name="current_password_for_security" required placeholder="••••••••" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 pt-3 border-t border-indigo-100/60">
+                            <button type="button" onclick="toggleSecurityQuestionForm(false)" class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition cursor-pointer">
+                                Cancel
+                            </button>
+                            <button type="submit" class="border-2 border-indigo-600 text-indigo-700 hover:bg-indigo-600 hover:text-white font-semibold rounded-2xl px-5 py-2 text-xs transition active:scale-[0.99] cursor-pointer">
+                                Save Recovery Question
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
         <!-- Right Side: Compact Branch Card & Closely Positioned Logout (1 column) -->
         <div class="space-y-4">
-            <!-- 1. Compact Branch Card -->
+            <!-- 1. Compact Branch Card (Non-clickable / Note) -->
             <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
-                <div class="absolute top-0 inset-x-0 h-1.5 bg-indigo-600"></div>
+                <div class="absolute top-0 inset-x-0 h-1.5 bg-blue-600"></div>
 
-                <!-- Header with Branch Title and Edit Button side by side -->
+                <!-- Header with Branch Title and Assigned Badge -->
                 <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
                     <div class="flex items-center gap-2.5">
-                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-100/80 text-indigo-600 shadow-2xs">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100/80 text-blue-600 shadow-2xs">
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div>
                             <h2 class="text-lg font-bold tracking-tight text-slate-900">Branch</h2>
-                            <!-- Edit Button directly next to title -->
-                            <button type="button" id="toggleBranchBtn" onclick="toggleEditBranchMode()" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100/80 px-2.5 py-1 rounded-xl transition cursor-pointer">
-                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                <span id="branchBtnText">Edit</span>
-                            </button>
+                            <p class="text-[11px] font-medium text-slate-400">Your default laundry branch</p>
                         </div>
                     </div>
+
+                    <!-- Toggle Edit Branch Button -->
+                    <button type="button" onclick="toggleEditBranchMode()" id="toggleBranchBtn" class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition active:scale-[0.98] cursor-pointer">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span id="branchBtnText">Edit</span>
+                    </button>
                 </div>
 
                 <!-- VIEW-ONLY BRANCH SECTION -->
@@ -194,7 +270,7 @@
                         <label class="block font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
                             Select Branch <span class="text-rose-500">*</span>
                         </label>
-                        <select name="branch_id" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 font-semibold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition cursor-pointer">
+                        <select name="branch_id" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition cursor-pointer">
                             @foreach($branches as $branch)
                                 <option value="{{ $branch->id }}" @selected($customerUser->branch_id == $branch->id)>
                                     {{ $branch->name }} — {{ $branch->address }}
@@ -208,14 +284,57 @@
                         <button type="button" onclick="toggleEditBranchMode(false)" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
                             Cancel
                         </button>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl px-4 py-1.5 text-xs shadow-xs transition active:scale-[0.99] cursor-pointer">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-4 py-1.5 text-xs shadow-xs transition active:scale-[0.99] cursor-pointer">
                             Save
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- 2. Logout Card (Directly below Branch) -->
+            <!-- 2. Feedback & Complaints Card -->
+            <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                <div class="absolute top-0 inset-x-0 h-1.5 bg-blue-600"></div>
+
+                <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100/80 text-blue-600 shadow-2xs">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold tracking-tight text-slate-900 leading-tight">Feedback &amp; Complaints</h2>
+                            <p class="text-[11px] font-medium text-slate-400">Share reviews or report issues</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Share your laundry experience, suggest improvements, or report an operational issue directly to management.
+                    </p>
+
+                    @php
+                        $userSubmissionsCount = \App\Models\Feedback::where('customer_id', $customerUser->id)->count();
+                    @endphp
+
+                    <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3 flex items-center justify-between">
+                        <span class="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">My Submissions</span>
+                        <span class="text-xs font-bold text-slate-800 font-mono">
+                            {{ $userSubmissionsCount }} {{ Str::plural('Entry', $userSubmissionsCount) }}
+                        </span>
+                    </div>
+
+                    <a href="{{ route('customer.feedback') }}" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 text-xs shadow-md shadow-blue-600/20 transition active:scale-[0.99] cursor-pointer">
+                        <span>Open Feedback &amp; Complaints</span>
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. Logout Card (Directly below Feedback & Complaints) -->
             <form action="{{ route('customer.logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="w-full border border-rose-200/80 bg-rose-50/40 hover:bg-rose-100/60 text-rose-600 hover:text-rose-700 font-semibold rounded-2xl py-3.5 px-4 text-sm flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer shadow-2xs">
@@ -280,6 +399,20 @@
             }
         }
 
+        function toggleSecurityQuestionForm(forceState) {
+            const secForm = document.getElementById('securityQuestionForm');
+            const icon = document.getElementById('securityQuestionToggleIcon');
+            const isShowing = forceState !== undefined ? forceState : secForm.classList.contains('hidden');
+
+            if (isShowing) {
+                secForm.classList.remove('hidden');
+                if (icon) icon.classList.add('rotate-180');
+            } else {
+                secForm.classList.add('hidden');
+                if (icon) icon.classList.remove('rotate-180');
+            }
+        }
+
         @if($errors->has('phone'))
             toggleEditProfileMode(true);
         @endif
@@ -290,6 +423,10 @@
 
         @if($errors->has('current_password') || $errors->has('new_password'))
             togglePasswordForm(true);
+        @endif
+
+        @if($errors->has('security_question') || $errors->has('security_answer') || $errors->has('current_password_for_security'))
+            toggleSecurityQuestionForm(true);
         @endif
     </script>
 </x-customer-layout>

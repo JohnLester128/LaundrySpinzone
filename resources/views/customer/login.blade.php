@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Customer Login — Spinzone Laundry</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,11 +32,9 @@
 
             <!-- Logo & Brand Header -->
             <div class="flex flex-col items-center text-center">
-                <!-- Water Drop Icon Badge -->
-                <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25">
-                    <svg class="h-7 w-7 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2.69c0 0-6.36 7.42-6.36 11.66A6.36 6.36 0 0 0 12 20.71a6.36 6.36 0 0 0 6.36-6.36C18.36 10.11 12 2.69 12 2.69zM12 18.7a4.36 4.36 0 0 1-4.36-4.35c0-2.31 3.12-6.52 4.36-8.08 1.24 1.56 4.36 5.76 4.36 8.08A4.36 4.36 0 0 1 12 18.7z"/>
-                    </svg>
+                <!-- Spinzone Brand Logo -->
+                <div class="mb-3.5 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-blue-500/15 bg-white border border-slate-200/80 p-1">
+                    <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone Laundry" class="h-full w-full object-contain rounded-xl">
                 </div>
 
                 <!-- Brand Title -->
@@ -64,7 +63,7 @@
             </div>
 
             <!-- Login Form -->
-            <form class="mt-5 space-y-4" action="{{ route('customer.login.store') }}" method="POST">
+            <form class="mt-5 space-y-4" action="{{ route('customer.login.store', [], false) }}" method="POST">
                 @csrf
                 
                 <!-- Username Input -->
@@ -92,7 +91,7 @@
 
                 <!-- Password Input with Toggle -->
                 <div>
-                    <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                    <label for="loginPasswordInput" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
                         Password
                     </label>
                     <div class="relative">
@@ -123,6 +122,25 @@
                     </div>
                 </div>
 
+                <!-- Remember Me & Forgot Password Row -->
+                <div class="flex items-center justify-between pt-0.5">
+                    <label for="rememberCustomer" class="inline-flex items-center gap-2 cursor-pointer select-none group">
+                        <input 
+                            type="checkbox" 
+                            id="rememberCustomer" 
+                            name="remember" 
+                            value="1"
+                            @checked(old('remember'))
+                            class="h-4 w-4 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500/30 transition cursor-pointer"
+                        />
+                        <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition">Remember me</span>
+                    </label>
+
+                    <a href="{{ route('customer.password.request') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline transition">
+                        Forgot Password?
+                    </a>
+                </div>
+
                 <!-- Submit Button -->
                 <button 
                     type="submit" 
@@ -143,6 +161,19 @@
                     class="mt-2 inline-flex items-center justify-center w-full rounded-2xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 py-3 text-xs font-bold text-slate-800 transition duration-200"
                 >
                     Create New Account
+                </a>
+            </div>
+
+            <!-- Staff & Manager Portal Switch Link -->
+            <div class="mt-4 pt-3 border-t border-slate-100/70 text-center">
+                <a 
+                    href="{{ route('admin.login') }}" 
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition"
+                >
+                    <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span>Branch Manager &amp; Staff Login &rarr;</span>
                 </a>
             </div>
 
@@ -167,6 +198,13 @@
                 }
             }
         }
+
+        // Prevent stale CSRF token on back-forward cache navigation
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
     </script>
 </body>
 </html>

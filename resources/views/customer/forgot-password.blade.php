@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Reset Password — Spinzone Laundry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center p-4 sm:p-6 antialiased selection:bg-blue-500 selection:text-white relative overflow-x-hidden">
+
+    <!-- Ambient Background Blobs -->
+    <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div class="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-100/60 blur-3xl"></div>
+        <div class="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-indigo-100/50 blur-3xl"></div>
+        <div class="absolute -bottom-32 left-1/4 h-96 w-96 rounded-full bg-teal-100/40 blur-3xl"></div>
+    </div>
+
+    <main class="w-full max-w-md relative z-10">
+        <!-- Main Card -->
+        <div class="relative overflow-hidden rounded-3xl bg-white/95 p-7 sm:p-9 shadow-xl shadow-slate-900/5 border border-slate-200/80 backdrop-blur-md">
+            
+            <!-- Top Gradient Bar -->
+            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500"></div>
+
+            <!-- Logo & Brand Header -->
+            <div class="flex flex-col items-center text-center">
+                <!-- Spinzone Brand Logo -->
+                <div class="mb-3.5 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-blue-500/15 bg-white border border-slate-200/80 p-1">
+                    <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone Laundry" class="h-full w-full object-contain rounded-xl">
+                </div>
+
+                <!-- Brand Title -->
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                    Reset <span class="text-blue-600">Password</span>
+                </h1>
+                <p class="text-xs font-medium text-slate-400 mt-1">
+                    @if($customer)
+                        Answer your security question to set a new password
+                    @else
+                        Enter your username to recover your account
+                    @endif
+                </p>
+
+                <!-- Step Indicator Badge -->
+                <div class="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-slate-100/90 px-3.5 py-1 text-xs text-slate-600 border border-slate-200/80">
+                    <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>Step <strong class="font-bold text-slate-900">{{ $customer ? '2 of 2' : '1 of 2' }}</strong>: {{ $customer ? 'Security Verification' : 'Find Account' }}</span>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="mt-5">
+                <x-notification />
+            </div>
+
+            @if(!$customer)
+                <!-- STEP 1: Enter Username Form -->
+                <form class="mt-5 space-y-4" action="{{ route('customer.password.verify-user') }}" method="POST">
+                    @csrf
+
+                    <div>
+                        <label for="forgotUsernameInput" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            Username <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="forgotUsernameInput"
+                                name="username" 
+                                autocomplete="username"
+                                spellcheck="false"
+                                placeholder="Enter your username" 
+                                value="{{ old('username', $username) }}" 
+                                required 
+                                autofocus
+                                class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                            />
+                        </div>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="mt-2 w-full rounded-2xl bg-blue-600 hover:bg-blue-700 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 transition duration-200 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                    >
+                        <span>Continue</span>
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                </form>
+            @else
+                <!-- STEP 2: Answer Security Question & Set New Password -->
+                <form class="mt-5 space-y-4" action="{{ route('customer.password.reset') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="username" value="{{ $customer->username }}">
+
+                    <!-- Selected Username Summary -->
+                    <div class="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 flex items-center justify-between">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-100/80 text-blue-600">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Account</p>
+                                <p class="text-sm font-bold text-slate-900 truncate">{{ $customer->username }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('customer.password.request') }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 underline shrink-0">
+                            Change
+                        </a>
+                    </div>
+
+                    <!-- Security Question Display Card -->
+                    <div class="rounded-2xl border border-blue-200/70 bg-blue-50/50 p-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-blue-600">Your Security Question</span>
+                        </div>
+                        <p class="text-sm font-bold text-slate-900 leading-snug">{{ $customer->security_question }}</p>
+                    </div>
+
+                    <!-- Security Answer Input -->
+                    <div>
+                        <label for="resetSecurityAnswerInput" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            Your Answer <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="resetSecurityAnswerInput"
+                                name="security_answer" 
+                                autocomplete="off"
+                                placeholder="Enter your security answer" 
+                                required 
+                                autofocus
+                                class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- New Password Input -->
+                    <div>
+                        <label for="resetPasswordInput" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            New Password <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="resetPasswordInput"
+                                name="password" 
+                                autocomplete="new-password"
+                                placeholder="At least 6 characters" 
+                                required 
+                                minlength="6"
+                                class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-11 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePasswordVisibility('resetPasswordInput', 'resetPasswordToggleIcon')" 
+                                class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                                title="Toggle password visibility"
+                            >
+                                <svg id="resetPasswordToggleIcon" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Confirm New Password Input -->
+                    <div>
+                        <label for="resetPasswordConfirmInput" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                            Confirm New Password <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="resetPasswordConfirmInput"
+                                name="password_confirmation" 
+                                autocomplete="new-password"
+                                placeholder="Repeat your new password" 
+                                required 
+                                minlength="6"
+                                class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-11 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePasswordVisibility('resetPasswordConfirmInput', 'resetPasswordConfirmToggleIcon')" 
+                                class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                                title="Toggle password visibility"
+                            >
+                                <svg id="resetPasswordConfirmToggleIcon" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit" 
+                        class="mt-2 w-full rounded-2xl bg-blue-600 hover:bg-blue-700 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 transition duration-200 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                    >
+                        <span>Reset Password</span>
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </button>
+                </form>
+            @endif
+
+            <!-- Back to Login Footer Link -->
+            <div class="mt-6 pt-5 border-t border-slate-100 text-center">
+                <p class="text-xs text-slate-500">Remembered your password?</p>
+                <a 
+                    href="{{ route('customer.login') }}" 
+                    class="mt-2 inline-flex items-center justify-center w-full rounded-2xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 py-3 text-xs font-bold text-slate-800 transition duration-200"
+                >
+                    Back to Customer Login
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />';
+                }
+            } else {
+                input.type = 'password';
+                if (icon) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+                }
+            }
+        }
+
+        const passInput = document.getElementById('resetPasswordInput');
+        const confirmInput = document.getElementById('resetPasswordConfirmInput');
+        function validatePasswordMatch() {
+            if (confirmInput && passInput && confirmInput.value && passInput.value !== confirmInput.value) {
+                confirmInput.setCustomValidity("Passwords do not match");
+            } else if (confirmInput) {
+                confirmInput.setCustomValidity("");
+            }
+        }
+        if (passInput && confirmInput) {
+            passInput.addEventListener('input', validatePasswordMatch);
+            confirmInput.addEventListener('input', validatePasswordMatch);
+        }
+    </script>
+</body>
+</html>
+

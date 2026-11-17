@@ -1,24 +1,29 @@
 <x-admin-layout>
-    <x-slot:title>Admin Profile - Laundry Spinzone</x-slot:title>
-    <x-slot:header>Admin Profile</x-slot:header>
+    @php
+        $adminUser = auth('admin')->user();
+        $isOwner = $adminUser?->isSuperAdmin() ?? false;
+    @endphp
+
+    <x-slot:title>{{ $isOwner ? 'Owner Profile' : 'Manager Profile' }} - Laundry Spinzone</x-slot:title>
+    <x-slot:header>{{ $isOwner ? 'Owner Profile' : 'Manager Profile' }}</x-slot:header>
 
     <!-- Page Header -->
     <div class="mb-6">
-        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Admin Profile</h1>
-        <p class="text-sm font-medium text-slate-500 mt-1">Manage your account settings and administrative preferences.</p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">{{ $isOwner ? 'Owner Profile' : 'Manager Profile' }}</h1>
+        <p class="text-sm font-medium text-slate-500 mt-1">{{ $isOwner ? 'Manage your account settings and security credentials.' : 'View your account information and manage your password.' }}</p>
     </div>
 
     <!-- Notification Banner -->
     <x-notification />
 
-    <!-- Main Profile Grid (2 Columns on lg screens: 2 cols left, 1 col right) -->
-    <div class="grid gap-6 lg:grid-cols-3">
-        <!-- Left Side: Unified Profile Information Card (Spans 2 columns) -->
-        <div class="lg:col-span-2">
+    <!-- 2-Column Responsive Layout (Identical to Customer Profile) -->
+    <div class="grid gap-6 lg:grid-cols-3 items-start">
+        <!-- Left Side: Profile Information Card (Spans 2 columns) -->
+        <div class="lg:col-span-2 space-y-6">
             <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-sm">
                 <div class="absolute top-0 inset-x-0 h-1.5 bg-blue-600"></div>
 
-                <!-- Top Card Header & Action Buttons -->
+                <!-- Header & Action Button -->
                 <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-100">
                     <div class="flex items-center gap-3">
                         <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-100/80 text-blue-600 shadow-2xs">
@@ -28,107 +33,78 @@
                         </div>
                         <div>
                             <h2 class="text-xl font-bold tracking-tight text-slate-900">Profile Information</h2>
-                            <p class="text-xs font-medium text-slate-400">Account login identity, branch details, and security.</p>
+                            <p class="text-xs font-medium text-slate-400">Account login identity, contact phone number, and security.</p>
                         </div>
                     </div>
 
-                    <!-- Action Button: Edit Profile Only -->
-                    <div class="flex items-center gap-2.5">
-                        <button type="button" id="toggleEditBtn" onclick="toggleEditMode()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl px-4 py-2.5 text-xs shadow-md shadow-blue-600/20 transition active:scale-[0.99] flex items-center gap-1.5 cursor-pointer">
+                    @if($isOwner)
+                        <!-- Action Button: Edit Profile (Owner Only) -->
+                        <button type="button" id="toggleEditBtn" onclick="toggleEditProfileMode()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl px-4 py-2.5 text-xs shadow-md shadow-blue-600/20 transition active:scale-[0.99] flex items-center gap-1.5 cursor-pointer">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                             <span id="editBtnText">Edit Profile</span>
                         </button>
-                    </div>
+                    @endif
                 </div>
 
-                <!-- VIEW-ONLY SECTION (Default View) -->
-                <div id="viewProfileSection" class="mt-6 space-y-6">
-                    <!-- User Details -->
-                    <div class="grid gap-4 sm:grid-cols-2">
+                <!-- VIEW-ONLY PROFILE SECTION (Default) -->
+                <div id="viewProfileSection" class="mt-6">
+                    <div class="grid gap-4 sm:grid-cols-3">
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
                             <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400">Username</p>
-                            <p class="text-base font-bold text-slate-900 mt-1">{{ auth('admin')->user()->username }}</p>
+                            <p class="text-base font-bold text-slate-900 mt-1">{{ $adminUser->username }}</p>
                         </div>
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
                             <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400">Phone Number</p>
-                            <p class="text-base font-bold text-slate-900 mt-1">{{ auth('admin')->user()->phone ?? 'Not specified' }}</p>
+                            <p class="text-base font-bold text-slate-900 mt-1">{{ $adminUser->phone ?: 'Not specified' }}</p>
                         </div>
-                    </div>
-
-                    <!-- Branch Details -->
-                    <div class="pt-4 border-t border-slate-100">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-                            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                            <span>Branch Location</span>
-                        </p>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-                                <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400">Branch Name</p>
-                                <p class="text-base font-bold text-slate-900 mt-1">{{ $branch->name ?? 'Central Branch' }}</p>
-                            </div>
-                            <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-                                <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400">Branch Address</p>
-                                <p class="text-base font-bold text-slate-900 mt-1">{{ $branch->address ?? 'Not specified' }}</p>
+                        <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                            <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400">System Role</p>
+                            <div class="mt-1 flex items-center">
+                                <span class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold {{ $adminUser->getRoleBadgeClasses() }}">
+                                    <span class="h-1.5 w-1.5 rounded-full {{ $isOwner ? 'bg-purple-500' : 'bg-blue-500' }}"></span>
+                                    {{ $adminUser->getRoleBadgeLabel() }}
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- EDITABLE PROFILE FORM (Hidden by default, shown on clicking Edit Profile) -->
-                <form id="editProfileForm" action="{{ route('admin.profile.update') }}" method="POST" class="mt-6 space-y-5 hidden">
-                    @csrf
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                Username
-                            </label>
-                            <input type="text" name="username" value="{{ old('username', auth('admin')->user()->username) }}" required class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
-                        </div>
-
-                        <div>
-                            <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                Phone Number
-                            </label>
-                            <input type="text" name="phone" value="{{ old('phone', auth('admin')->user()->phone) }}" placeholder="e.g. +63 912 345 6789" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
-                        </div>
-                    </div>
-
-                    <div class="pt-4 border-t border-slate-100">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Branch Details</p>
+                @if($isOwner)
+                    <!-- EDITABLE PROFILE FORM (Owner Only) -->
+                    <form id="editProfileForm" action="{{ route('admin.profile.update') }}" method="POST" class="mt-6 space-y-5 hidden">
+                        @csrf
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Branch Name
+                                    Username
                                 </label>
-                                <input type="text" name="branch_name" value="{{ old('branch_name', $branch->name ?? '') }}" required placeholder="e.g. Central Branch" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                <input type="text" name="username" value="{{ old('username', $adminUser->username) }}" required class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
                             </div>
 
                             <div>
                                 <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
-                                    Branch Address
+                                    Phone Number
                                 </label>
-                                <input type="text" name="branch_address" value="{{ old('branch_address', $branch->address ?? '') }}" required placeholder="e.g. 123 Main St, Suite 400" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                <input type="text" name="phone" value="{{ old('phone', $adminUser->phone) }}" placeholder="e.g. +63 912 345 6789" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition">
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Form Action Controls -->
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                        <button type="button" onclick="toggleEditMode(false)" class="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
-                            Cancel
-                        </button>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl px-6 py-2.5 text-xs shadow-md shadow-blue-600/20 transition active:scale-[0.99] flex items-center gap-1.5 cursor-pointer">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Save Changes</span>
-                        </button>
-                    </div>
-                </form>
+                        <!-- Form Action Controls -->
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                            <button type="button" onclick="toggleEditProfileMode(false)" class="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl px-6 py-2.5 text-xs shadow-md shadow-blue-600/20 transition active:scale-[0.99] flex items-center gap-1.5 cursor-pointer">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    </form>
+                @endif
 
                 <!-- PASSWORD SUBSECTION (Clickable Accordion) -->
                 <div id="securitySection" class="mt-6 pt-6 border-t border-slate-100">
@@ -140,8 +116,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold tracking-tight text-slate-900 group-hover:text-teal-700 transition">Password</h3>
-                                <p class="text-xs text-slate-400">Click to update your administrator password credentials.</p>
+                                <h3 class="text-sm font-bold tracking-tight text-slate-900 group-hover:text-teal-700 transition">Password & Security</h3>
+                                <p class="text-xs text-slate-400">Click to change your account password.</p>
                             </div>
                         </div>
                         <div class="flex items-center">
@@ -183,64 +159,69 @@
             </div>
         </div>
 
-        <!-- Right Side: Administration + Settings (Opens in new tab) + Logout (1 column) -->
-        <div class="space-y-6">
-            <!-- 1. Administration Card -->
-            <div class="rounded-3xl border border-blue-100 bg-blue-50/50 p-6 shadow-sm">
-                <div class="flex items-center gap-2.5 mb-4">
-                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-500/20">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold tracking-tight text-blue-950">Administration</h2>
-                </div>
+        <!-- Right Side: Branch Card (Managers only) & Logout -->
+        <div class="space-y-4">
+            @if(!$isOwner)
+                <!-- 1. Compact Branch Card for Branch Managers (View Only) -->
+                <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                    <div class="absolute top-0 inset-x-0 h-1.5 bg-indigo-600"></div>
 
-                <div class="space-y-3">
-                    <a href="{{ route('admin.customers') }}" class="group flex items-center justify-between rounded-2xl border border-white bg-white p-4 shadow-xs hover:shadow-md transition">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <!-- Header with Branch Title -->
+                    <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-100/80 text-indigo-600 shadow-2xs">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
                             </div>
-                            <span class="text-sm font-semibold text-slate-800">Customers</span>
-                        </div>
-                        <span class="text-slate-400 transition group-hover:text-blue-600 group-hover:translate-x-0.5">→</span>
-                    </a>
-
-                    <a href="{{ route('admin.login-logs') }}" class="group flex items-center justify-between rounded-2xl border border-white bg-white p-4 shadow-xs hover:shadow-md transition">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                            <div>
+                                <h2 class="text-base font-bold tracking-tight text-slate-900">Assigned Branch</h2>
+                                <p class="text-[11px] text-slate-400">Branch assigned by Store Owner</p>
                             </div>
-                            <span class="text-sm font-semibold text-slate-800">Login Logs</span>
                         </div>
-                        <span class="text-slate-400 transition group-hover:text-purple-600 group-hover:translate-x-0.5">→</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- 2. Standalone SETTINGS Card -->
-            <a href="{{ route('admin.settings') }}" class="group flex items-center justify-between rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-md hover:border-indigo-300 transition block cursor-pointer">
-                <div class="flex items-center gap-3.5">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 shadow-2xs group-hover:bg-indigo-600 group-hover:text-white transition">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-bold tracking-tight text-slate-900 group-hover:text-indigo-600 transition">Settings</h2>
-                        <p class="text-xs text-slate-400">Pricing, durations & add-ons</p>
+
+                    <!-- VIEW-ONLY BRANCH SECTION -->
+                    <div id="viewBranchSection" class="mt-4 space-y-2.5">
+                        <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5">
+                            <p class="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Branch Name</p>
+                            <p class="text-sm font-bold text-slate-900 mt-0.5">
+                                {{ $branch->name ?? 'Central Branch' }}
+                            </p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5">
+                            <p class="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Branch Location</p>
+                            <p class="text-xs font-semibold text-slate-700 mt-0.5 leading-snug">
+                                {{ $branch->address ?? 'Not specified' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <span class="text-slate-400 transition group-hover:text-indigo-600 group-hover:translate-x-0.5">→</span>
-            </a>
+            @else
+                <!-- Owner Role Card (No branches) -->
+                <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                    <div class="absolute top-0 inset-x-0 h-1.5 bg-purple-600"></div>
+                    <div class="flex items-center gap-2.5 pb-3.5 border-b border-slate-100">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-100/80 text-purple-600 shadow-2xs">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-bold tracking-tight text-slate-900">System Owner</h2>
+                            <p class="text-[11px] text-slate-400">Full administrative access</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2.5">
+                        <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5">
+                            <p class="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">Account Access</p>
+                            <p class="text-xs font-bold text-slate-900 mt-0.5">Global System Administrator</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
-            <!-- 3. Standalone Logout Card -->
+            <!-- 2. Logout Card -->
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="w-full border border-rose-200/80 bg-rose-50/40 hover:bg-rose-100/60 text-rose-600 hover:text-rose-700 font-semibold rounded-2xl py-3.5 px-4 text-sm flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer shadow-2xs">
@@ -255,21 +236,22 @@
 
     <!-- Toggle Scripts -->
     <script>
-        function toggleEditMode(forceState) {
+        function toggleEditProfileMode(forceState) {
             const viewSection = document.getElementById('viewProfileSection');
             const editForm = document.getElementById('editProfileForm');
             const editBtnText = document.getElementById('editBtnText');
+            if (!editForm) return;
             
             const isEditing = forceState !== undefined ? forceState : editForm.classList.contains('hidden');
 
             if (isEditing) {
                 viewSection.classList.add('hidden');
                 editForm.classList.remove('hidden');
-                editBtnText.textContent = 'Cancel Edit';
+                if (editBtnText) editBtnText.textContent = 'Cancel';
             } else {
                 editForm.classList.add('hidden');
                 viewSection.classList.remove('hidden');
-                editBtnText.textContent = 'Edit Profile';
+                if (editBtnText) editBtnText.textContent = 'Edit Profile';
             }
         }
 
@@ -288,13 +270,13 @@
         }
 
         // Auto-expand password form if there are password error messages
-        @if($errors->has('current_password') || $errors->has('new_password'))
+        @if(($errors ?? false) && ($errors->has('current_password') || $errors->has('new_password')))
             togglePasswordForm(true);
         @endif
 
-        // Auto-expand edit profile form if there are profile error messages
-        @if($errors->has('username') || $errors->has('phone') || $errors->has('branch_name') || $errors->has('branch_address'))
-            toggleEditMode(true);
+        // Auto-expand edit profile form if there are profile error messages (Owner Only)
+        @if($isOwner && ($errors ?? false) && ($errors->has('username') || $errors->has('phone')))
+            toggleEditProfileMode(true);
         @endif
     </script>
 </x-admin-layout>

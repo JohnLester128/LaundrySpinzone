@@ -31,11 +31,9 @@
 
             <!-- Logo & Brand Header -->
             <div class="flex flex-col items-center text-center">
-                <!-- Water Drop Icon Badge -->
-                <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25">
-                    <svg class="h-7 w-7 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2.69c0 0-6.36 7.42-6.36 11.66A6.36 6.36 0 0 0 12 20.71a6.36 6.36 0 0 0 6.36-6.36C18.36 10.11 12 2.69 12 2.69zM12 18.7a4.36 4.36 0 0 1-4.36-4.35c0-2.31 3.12-6.52 4.36-8.08 1.24 1.56 4.36 5.76 4.36 8.08A4.36 4.36 0 0 1 12 18.7z"/>
-                    </svg>
+                <!-- Spinzone Brand Logo -->
+                <div class="mb-3.5 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-blue-500/15 bg-white border border-slate-200/80 p-1">
+                    <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone Laundry" class="h-full w-full object-contain rounded-xl">
                 </div>
 
                 <!-- Brand Title -->
@@ -79,7 +77,7 @@
 
                 <!-- Phone Number Input -->
                 <div>
-                    <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                    <label for="registerPhoneInput" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
                         Phone Number <span class="text-slate-400 font-normal">(Optional)</span>
                     </label>
                     <div class="relative">
@@ -89,10 +87,68 @@
                             </svg>
                         </div>
                         <input 
-                            type="text" 
+                            type="tel" 
+                            id="registerPhoneInput"
                             name="phone" 
+                            autocomplete="tel"
                             placeholder="e.g. +63 912 345 6789" 
                             value="{{ old('phone') }}" 
+                            class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                        />
+                    </div>
+                </div>
+
+                <!-- Security Question Dropdown -->
+                <div>
+                    <label for="registerSecurityQuestion" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                        Security Question <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <select 
+                            id="registerSecurityQuestion"
+                            name="security_question" 
+                            required
+                            class="w-full appearance-none rounded-2xl border border-slate-200 bg-white pl-10 pr-10 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs cursor-pointer"
+                        >
+                            <option value="" disabled {{ old('security_question') ? '' : 'selected' }}>Select a security question...</option>
+                            @foreach(($securityQuestions ?? \App\Models\Customer::SECURITY_QUESTIONS) as $question)
+                                <option value="{{ $question }}" @selected(old('security_question') === $question)>
+                                    {{ $question }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Answer Input -->
+                <div>
+                    <label for="registerSecurityAnswer" class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                        Security Answer <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="registerSecurityAnswer"
+                            name="security_answer" 
+                            autocomplete="off"
+                            placeholder="Your answer (used if you forget your password)" 
+                            value="{{ old('security_answer') }}" 
+                            required
                             class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
                         />
                     </div>
@@ -115,6 +171,7 @@
                             name="password" 
                             placeholder="At least 6 characters" 
                             required 
+                            minlength="6"
                             class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-11 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
                         />
                         <button 
@@ -124,6 +181,40 @@
                             title="Toggle password visibility"
                         >
                             <svg id="regPasswordToggleIcon" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Input with Toggle -->
+                <div>
+                    <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                        Confirm Password <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <input 
+                            type="password" 
+                            id="registerPasswordConfirmInput"
+                            name="password_confirmation" 
+                            placeholder="Repeat your password" 
+                            required 
+                            minlength="6"
+                            class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-11 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                        />
+                        <button 
+                            type="button" 
+                            onclick="togglePasswordVisibility('registerPasswordConfirmInput', 'regPasswordConfirmToggleIcon')" 
+                            class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                            title="Toggle password visibility"
+                        >
+                            <svg id="regPasswordConfirmToggleIcon" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
@@ -174,6 +265,20 @@
                     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
                 }
             }
+        }
+
+        const passInput = document.getElementById('registerPasswordInput');
+        const confirmInput = document.getElementById('registerPasswordConfirmInput');
+        function validatePasswordMatch() {
+            if (confirmInput.value && passInput.value !== confirmInput.value) {
+                confirmInput.setCustomValidity("Passwords do not match");
+            } else {
+                confirmInput.setCustomValidity("");
+            }
+        }
+        if (passInput && confirmInput) {
+            passInput.addEventListener('input', validatePasswordMatch);
+            confirmInput.addEventListener('input', validatePasswordMatch);
         }
     </script>
 </body>

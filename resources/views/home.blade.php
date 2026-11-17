@@ -31,10 +31,8 @@
                 
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                        <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                            <path d="M12 2.69c0 0-6.36 7.42-6.36 11.66A6.36 6.36 0 0 0 12 20.71a6.36 6.36 0 0 0 6.36-6.36C18.36 10.11 12 2.69 12 2.69zM12 18.7a4.36 4.36 0 0 1-4.36-4.35c0-2.31 3.12-6.52 4.36-8.08 1.24 1.56 4.36 5.76 4.36 8.08A4.36 4.36 0 0 1 12 18.7z"/>
-                        </svg>
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform bg-white border border-slate-200/70 p-0.5">
+                        <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone" class="h-full w-full object-contain rounded-lg">
                     </div>
                     <div>
                         <span class="text-lg font-extrabold tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
@@ -51,24 +49,41 @@
                     <a href="#portals" class="hover:text-blue-600 transition-colors">Portals</a>
                     <a href="#branches" class="hover:text-blue-600 transition-colors">Branches</a>
                     <a href="#features" class="hover:text-blue-600 transition-colors">Services</a>
-                    <a href="{{ route('customer.about') }}" class="hover:text-blue-600 transition-colors">About</a>
                 </nav>
 
                 <!-- Actions Header -->
                 <div class="flex items-center gap-2.5 sm:gap-3">
-                    <a href="{{ route('admin.login') }}" class="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-2xs">
-                        <svg class="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                        </svg>
-                        Staff Login
-                    </a>
+                    @if(auth('admin')->check())
+                        <a href="{{ route('admin.dashboard') }}" class="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-2xs">
+                            <svg class="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                            </svg>
+                            Staff Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('admin.login') }}" class="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-2xs">
+                            <svg class="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                            Staff Login
+                        </a>
+                    @endif
 
-                    <a href="{{ route('customer.choose-branch') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-sm shadow-blue-600/20 active:scale-98">
-                        <span>Choose Branch</span>
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                    </a>
+                    @if(auth('customer')->check())
+                        <a href="{{ route('customer.dashboard') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-sm shadow-blue-600/20 active:scale-98">
+                            <span>Customer Dashboard</span>
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </a>
+                    @else
+                        <a href="{{ route('customer.login') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-bold text-white hover:bg-blue-700 transition shadow-sm shadow-blue-600/20 active:scale-98">
+                            <span>Customer Login</span>
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                        </a>
+                    @endif
                 </div>
 
             </div>
@@ -103,23 +118,34 @@
 
                         <!-- Primary CTA Buttons -->
                         <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-                            <a href="{{ route('customer.choose-branch') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-0.5 transition duration-200">
-                                <svg class="h-5 w-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                                    <rect x="4" y="3" width="16" height="18" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <circle cx="12" cy="13" r="4" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <circle cx="8" cy="6" r="1" fill="currentColor"/>
-                                    <circle cx="11" cy="6" r="1" fill="currentColor"/>
-                                    <path d="M10.5 13.5a2 2 0 0 1 2.5-1" stroke-linecap="round"/>
-                                </svg>
-                                <span>Choose Branch &amp; Get Started</span>
-                            </a>
+                            @if(auth('customer')->check())
+                                <a href="{{ route('customer.dashboard') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-0.5 transition duration-200">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                                    </svg>
+                                    <span>Go to Customer Dashboard</span>
+                                </a>
+                                <a href="{{ route('customer.service-requests.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-6 py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition duration-200 shadow-2xs">
+                                    <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    <span>Book Laundry Request</span>
+                                </a>
+                            @else
+                                <a href="{{ route('customer.login') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 hover:from-blue-700 hover:to-indigo-700 hover:-translate-y-0.5 transition duration-200">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                                    </svg>
+                                    <span>Customer Login</span>
+                                </a>
 
-                            <a href="{{ route('customer.login') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-6 py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition duration-200 shadow-2xs">
-                                <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <span>Track My Laundry / Login</span>
-                            </a>
+                                <a href="{{ route('customer.register') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-6 py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition duration-200 shadow-2xs">
+                                    <svg class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.765z" />
+                                    </svg>
+                                    <span>Create Account / Register</span>
+                                </a>
+                            @endif
                         </div>
 
                         <!-- Stats Bar -->
@@ -198,7 +224,7 @@
                                 <ul class="mt-5 space-y-2.5 text-xs font-semibold text-slate-600">
                                     <li class="flex items-center gap-2">
                                         <svg class="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                                        Choose branch (Baybay, Panay &amp; more)
+                                        Select preferred branch (Baybay, Panay &amp; more)
                                     </li>
                                     <li class="flex items-center gap-2">
                                         <svg class="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
@@ -213,12 +239,9 @@
 
                             <!-- Portal CTAs -->
                             <div class="mt-7 pt-5 border-t border-slate-200/80 flex flex-col sm:flex-row gap-2.5">
-                                <a href="{{ route('customer.choose-branch') }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs">
-                                    <span>Choose Branch</span>
+                                <a href="{{ route('customer.login') }}" class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition shadow-xs">
+                                    <span>Customer Login</span>
                                     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
-                                </a>
-                                <a href="{{ route('customer.login') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
-                                    Login
                                 </a>
                                 <a href="{{ route('customer.register') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
                                     Register
@@ -297,8 +320,8 @@
                             </p>
                         </div>
 
-                        <a href="{{ route('customer.choose-branch') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline">
-                            <span>Open Full Branch Chooser</span>
+                        <a href="{{ route('customer.login') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline">
+                            <span>Go to Customer Login</span>
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
                         </a>
                     </div>
@@ -454,10 +477,8 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
                 
                 <div class="flex items-center gap-2.5">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white">
-                        <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                            <path d="M12 2.69c0 0-6.36 7.42-6.36 11.66A6.36 6.36 0 0 0 12 20.71a6.36 6.36 0 0 0 6.36-6.36C18.36 10.11 12 2.69 12 2.69zM12 18.7a4.36 4.36 0 0 1-4.36-4.35c0-2.31 3.12-6.52 4.36-8.08 1.24 1.56 4.36 5.76 4.36 8.08A4.36 4.36 0 0 1 12 18.7z"/>
-                        </svg>
+                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg overflow-hidden shadow-xs bg-white border border-slate-200/70 p-0.5">
+                        <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone" class="h-full w-full object-contain rounded-md">
                     </div>
                     <span class="text-sm font-extrabold text-slate-900">
                         Spinzone <span class="text-blue-600">Laundry</span>
@@ -465,8 +486,8 @@
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-slate-500">
-                    <a href="{{ route('customer.choose-branch') }}" class="hover:text-blue-600 transition">Choose Branch</a>
                     <a href="{{ route('customer.login') }}" class="hover:text-blue-600 transition">Customer Login</a>
+                    <a href="{{ route('customer.register') }}" class="hover:text-blue-600 transition">Register</a>
                     <a href="{{ route('customer.about') }}" class="hover:text-blue-600 transition">About Us</a>
                     <a href="{{ route('admin.login') }}" class="hover:text-blue-600 transition">Staff Portal</a>
                 </div>

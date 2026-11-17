@@ -41,14 +41,17 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'remember' => 10080, // 7 days in minutes
         ],
         'customer' => [
             'driver' => 'session',
             'provider' => 'customers',
+            'remember' => 10080, // 7 days in minutes
         ],
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
+            'remember' => 10080, // 7 days in minutes
         ],
     ],
 

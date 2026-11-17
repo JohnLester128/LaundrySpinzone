@@ -6,8 +6,11 @@
         <!-- Compact Page Header -->
         <div class="pb-2.5 border-b border-slate-200/60">
             <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Service & Store Settings</h1>
-            <p class="text-xs font-medium text-slate-500">Configure cycle durations, price lists, and add-on supplies.</p>
+            <p class="text-xs font-medium text-slate-500">Configure cycle durations, price lists, add-on supplies, and branch management.</p>
         </div>
+
+        <!-- Navigation Tabs: Settings Hub -->
+        <x-settings-tabs />
 
         <!-- Notification Banner -->
         <x-notification />
@@ -70,6 +73,32 @@
                         </div>
                     </div>
 
+                    <!-- 2. Buffer Times -->
+                    <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xs">
+                        <div class="flex items-center gap-2.5 pb-2.5 mb-2.5 border-b border-slate-100">
+                            <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-100 text-amber-700 text-xs font-bold font-mono">
+                                2
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-slate-900">Wash Buffer Time</h2>
+                                <p class="text-[11px] text-slate-400">Transfer &amp; unload handling buffer</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <!-- Wash Buffer -->
+                            <div class="rounded-xl border border-slate-100 bg-slate-50/60 p-3 flex items-center justify-between gap-3 hover:bg-white hover:border-amber-200 transition shadow-2xs">
+                                <span class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                                    <span>Wash Buffer</span>
+                                </span>
+                                <div class="relative w-24 shrink-0">
+                                    <input type="number" min="0" max="120" required name="wash_buffer_minutes" value="{{ old('wash_buffer_minutes', $branch->wash_buffer_minutes ?? 5) }}" class="w-full rounded-lg border border-slate-200 bg-white pl-2 pr-6 py-1 text-xs font-bold text-slate-900 text-right focus:border-amber-500 outline-none">
+                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-[10px] text-slate-400 font-bold">m</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 3. Add-ons & Supplies (Placed Below Cycle Times) -->
                     <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xs">
                         <div class="flex items-center gap-2.5 pb-2.5 mb-2.5 border-b border-slate-100">
@@ -89,11 +118,11 @@
                                     <div class="flex items-center gap-2.5 shrink-0">
                                         <div class="relative w-22">
                                             <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2 text-[11px] font-bold text-slate-400">₱</span>
-                                            <input type="number" step="1" min="0" required name="addons[{{ $addon->id }}][price]" value="{{ old('addons.'.$addon->id.'.price', (int)$addon->price == $addon->price ? (int)$addon->price : $addon->price) }}" class="w-full rounded-lg border border-slate-200 bg-white pl-5 pr-2 py-1 text-xs font-bold text-slate-900 focus:border-teal-500 outline-none">
+                                            <input type="number" step="any" min="0" required name="addons[{{ $addon->id }}][price]" value="{{ old('addons.'.$addon->id.'.price', (int)$addon->price == $addon->price ? (int)$addon->price : $addon->price) }}" class="w-full rounded-lg border border-slate-200 bg-white pl-5 pr-2 py-1 text-xs font-bold text-slate-900 focus:border-teal-500 outline-none">
                                         </div>
                                         <label class="relative inline-flex items-center cursor-pointer shrink-0" title="Toggle active">
                                             <input type="checkbox" name="addons[{{ $addon->id }}][is_active]" value="1" {{ $addon->is_active ? 'checked' : '' }} class="sr-only peer">
-                                            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-teal-600"></div>
+                                            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-teal-600"></div>
                                         </label>
                                     </div>
                                 </div>
@@ -107,7 +136,7 @@
                     <div>
                         <div class="flex items-center gap-2.5 pb-2.5 mb-3 border-b border-slate-100">
                             <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-blue-700 text-xs font-bold font-mono">
-                                2
+                                4
                             </div>
                             <div>
                                 <h2 class="text-sm font-bold text-slate-900">Service Price List</h2>
@@ -134,7 +163,7 @@
                                                 <span class="text-xs font-bold text-slate-800">{{ $tier->name }}</span>
                                                 <div class="relative w-26 shrink-0">
                                                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2 text-xs font-bold text-slate-400">₱</span>
-                                                    <input type="number" step="1" min="0" required name="tiers[{{ $tier->id }}][price]" value="{{ old('tiers.'.$tier->id.'.price', (int)$tier->price == $tier->price ? (int)$tier->price : $tier->price) }}" class="w-full rounded-md border border-slate-200 bg-slate-50/60 pl-6 pr-2 py-1 text-xs font-bold text-slate-900 text-right focus:bg-white focus:border-blue-500 outline-none transition">
+                                                    <input type="number" step="any" min="0" required name="tiers[{{ $tier->id }}][price]" value="{{ old('tiers.'.$tier->id.'.price', (int)$tier->price == $tier->price ? (int)$tier->price : $tier->price) }}" class="w-full rounded-md border border-slate-200 bg-slate-50/60 pl-6 pr-2 py-1 text-xs font-bold text-slate-900 text-right focus:bg-white focus:border-blue-500 outline-none transition">
                                                 </div>
                                             </div>
                                         @endforeach

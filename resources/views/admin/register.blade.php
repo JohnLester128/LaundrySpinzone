@@ -19,7 +19,7 @@
     <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div class="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-100/60 blur-3xl"></div>
         <div class="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-indigo-100/50 blur-3xl"></div>
-        <div class="absolute -bottom-32 left-1/4 h-96 w-96 rounded-full bg-purple-100/40 blur-3xl"></div>
+        <div class="absolute -bottom-32 left-1/4 h-96 w-96 rounded-full bg-teal-100/40 blur-3xl"></div>
     </div>
 
     <main class="w-full max-w-md relative z-10">
@@ -27,15 +27,13 @@
         <div class="relative overflow-hidden rounded-3xl bg-white/95 p-7 sm:p-9 shadow-xl shadow-slate-900/5 border border-slate-200/80 backdrop-blur-md">
             
             <!-- Top Gradient Bar -->
-            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500"></div>
 
             <!-- Logo & Brand Header -->
             <div class="flex flex-col items-center text-center">
-                <!-- Admin Shield Icon Badge -->
-                <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-slate-900 to-blue-900 text-white shadow-lg shadow-slate-900/20">
-                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
+                <!-- Spinzone Brand Logo -->
+                <div class="mb-3.5 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-blue-500/15 bg-white border border-slate-200/80 p-1">
+                    <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone Laundry" class="h-full w-full object-contain rounded-xl">
                 </div>
 
                 <!-- Brand Title -->
@@ -45,9 +43,11 @@
                 <p class="text-xs font-medium text-slate-400 mt-1">Register a new system administrator</p>
 
                 <!-- Admin Badge -->
-                <div class="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-slate-900 text-white px-3.5 py-1 text-[11px] font-bold font-mono tracking-wider">
-                    <span class="h-1.5 w-1.5 rounded-full bg-blue-400"></span>
-                    <span>NEW STAFF ONBOARDING</span>
+                <div class="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-slate-100/90 px-3.5 py-1 text-xs text-slate-600 border border-slate-200/80">
+                    <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    <span>Action: <strong class="font-bold text-slate-900">New Staff Onboarding</strong></span>
                 </div>
             </div>
 
@@ -100,6 +100,7 @@
                             name="password" 
                             placeholder="At least 6 characters" 
                             required 
+                            minlength="6"
                             class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-11 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
                         />
                         <button 
@@ -116,10 +117,44 @@
                     </div>
                 </div>
 
+                <!-- Confirm Password Input with Toggle -->
+                <div>
+                    <label class="block font-mono text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                        Confirm Password <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <input 
+                            type="password" 
+                            id="adminRegPasswordConfirmInput"
+                            name="password_confirmation" 
+                            placeholder="Repeat your password" 
+                            required 
+                            minlength="6"
+                            class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-11 py-3 text-sm text-slate-900 font-semibold focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-2xs"
+                        />
+                        <button 
+                            type="button" 
+                            onclick="togglePasswordVisibility('adminRegPasswordConfirmInput', 'adminRegPassConfirmToggleIcon')" 
+                            class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                            title="Toggle password visibility"
+                        >
+                            <svg id="adminRegPassConfirmToggleIcon" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Submit Button -->
                 <button 
                     type="submit" 
-                    class="mt-2 w-full rounded-2xl bg-slate-900 hover:bg-slate-800 py-3.5 text-sm font-bold text-white shadow-md shadow-slate-900/20 transition duration-200 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                    class="mt-2 w-full rounded-2xl bg-blue-600 hover:bg-blue-700 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 transition duration-200 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
                 >
                     <span>Register Admin</span>
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -159,6 +194,20 @@
                     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
                 }
             }
+        }
+
+        const adminPassInput = document.getElementById('adminRegPasswordInput');
+        const adminConfirmInput = document.getElementById('adminRegPasswordConfirmInput');
+        function validateAdminPasswordMatch() {
+            if (adminConfirmInput.value && adminPassInput.value !== adminConfirmInput.value) {
+                adminConfirmInput.setCustomValidity("Passwords do not match");
+            } else {
+                adminConfirmInput.setCustomValidity("");
+            }
+        }
+        if (adminPassInput && adminConfirmInput) {
+            adminPassInput.addEventListener('input', validateAdminPasswordMatch);
+            adminConfirmInput.addEventListener('input', validateAdminPasswordMatch);
         }
     </script>
 </body>

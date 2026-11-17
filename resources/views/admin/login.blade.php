@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Login — Spinzone Laundry</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +20,7 @@
     <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div class="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-blue-100/60 blur-3xl"></div>
         <div class="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-indigo-100/50 blur-3xl"></div>
-        <div class="absolute -bottom-32 left-1/4 h-96 w-96 rounded-full bg-purple-100/40 blur-3xl"></div>
+        <div class="absolute -bottom-32 left-1/4 h-96 w-96 rounded-full bg-teal-100/40 blur-3xl"></div>
     </div>
 
     <main class="w-full max-w-md relative z-10">
@@ -27,27 +28,27 @@
         <div class="relative overflow-hidden rounded-3xl bg-white/95 p-7 sm:p-9 shadow-xl shadow-slate-900/5 border border-slate-200/80 backdrop-blur-md">
             
             <!-- Top Gradient Bar -->
-            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+            <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500"></div>
 
             <!-- Logo & Brand Header -->
             <div class="flex flex-col items-center text-center">
-                <!-- Admin Shield Icon Badge -->
-                <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-slate-900 to-blue-900 text-white shadow-lg shadow-slate-900/20">
-                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+                <!-- Spinzone Brand Logo -->
+                <div class="mb-3.5 flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-blue-500/15 bg-white border border-slate-200/80 p-1">
+                    <img src="{{ asset('images/spinzone-logo.png') }}" alt="Spinzone Laundry" class="h-full w-full object-contain rounded-xl">
                 </div>
 
                 <!-- Brand Title -->
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-                    Admin <span class="text-blue-600">Portal</span>
+                    Spinzone <span class="text-blue-600">Laundry</span>
                 </h1>
-                <p class="text-xs font-medium text-slate-400 mt-1">Management &amp; operations login</p>
+                <p class="text-xs font-medium text-slate-400 mt-1">Management &amp; operations portal</p>
 
                 <!-- Admin Badge -->
-                <div class="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-slate-900 text-white px-3.5 py-1 text-[11px] font-bold font-mono tracking-wider">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                    <span>STAFF AUTHENTICATION</span>
+                <div class="mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-slate-100/90 px-3.5 py-1 text-xs text-slate-600 border border-slate-200/80">
+                    <svg class="h-3.5 w-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span>Portal: <strong class="font-bold text-slate-900">Administrator Access</strong></span>
                 </div>
             </div>
 
@@ -57,7 +58,7 @@
             </div>
 
             <!-- Login Form -->
-            <form class="mt-5 space-y-4" action="{{ route('admin.login.store') }}" method="POST">
+            <form class="mt-5 space-y-4" action="{{ route('admin.login.store', [], false) }}" method="POST">
                 @csrf
                 
                 <!-- Username Input -->
@@ -116,10 +117,25 @@
                     </div>
                 </div>
 
+                <!-- Remember Me Row -->
+                <div class="flex items-center justify-between pt-0.5">
+                    <label for="rememberAdmin" class="inline-flex items-center gap-2 cursor-pointer select-none group">
+                        <input 
+                            type="checkbox" 
+                            id="rememberAdmin" 
+                            name="remember" 
+                            value="1"
+                            @checked(old('remember'))
+                            class="h-4 w-4 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500/30 transition cursor-pointer"
+                        />
+                        <span class="text-xs font-semibold text-slate-600 group-hover:text-slate-900 transition">Remember me</span>
+                    </label>
+                </div>
+
                 <!-- Submit Button -->
                 <button 
                     type="submit" 
-                    class="mt-2 w-full rounded-2xl bg-slate-900 hover:bg-slate-800 py-3.5 text-sm font-bold text-white shadow-md shadow-slate-900/20 transition duration-200 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+                    class="mt-2 w-full rounded-2xl bg-blue-600 hover:bg-blue-700 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 transition duration-200 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
                 >
                     <span>Login</span>
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -160,6 +176,13 @@
                 }
             }
         }
+
+        // Prevent stale CSRF token on back-forward cache navigation
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
     </script>
 </body>
 </html>

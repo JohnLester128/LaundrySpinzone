@@ -2,12 +2,16 @@
     <x-slot:title>Service Request #REQ-{{ str_pad($serviceRequest->id, 4, '0', STR_PAD_LEFT) }} — Spinzone Laundry</x-slot:title>
 
     @php
+        $cycle = $serviceRequest->cycle_info;
         $statusRaw = $serviceRequest->status;
+        $isResting = ($statusRaw === 'washing' && ($serviceRequest->cycle_phase === 'resting' || $cycle['phase'] === 'resting'));
+        $isFolding = ($statusRaw === 'drying' && ($serviceRequest->cycle_phase === 'folding' || $cycle['phase'] === 'folding'));
+
         $statusLabel = match($statusRaw) {
             'pending' => 'Pending',
             'received' => 'Received',
-            'washing' => 'Washing',
-            'drying' => 'Drying',
+            'washing' => $isResting ? 'Washed · Wash Buffer' : 'Washing',
+            'drying' => $isFolding ? 'Folding & Packaging' : 'Drying',
             'ready_for_pickup', 'ready' => 'Ready for Pickup',
             'completed' => 'Completed',
             'cancelled' => 'Cancelled',
@@ -17,8 +21,8 @@
         $statusBadgeClass = match($statusRaw) {
             'pending' => 'bg-amber-100 text-amber-700 border-amber-200',
             'received' => 'bg-slate-100 text-slate-700 border-slate-200',
-            'washing' => 'bg-purple-100 text-purple-700 border-purple-200',
-            'drying' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
+            'washing' => $isResting ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-purple-100 text-purple-700 border-purple-200',
+            'drying' => $isFolding ? 'bg-teal-100 text-teal-800 border-teal-300' : 'bg-indigo-100 text-indigo-700 border-indigo-200',
             'ready_for_pickup', 'ready' => 'bg-teal-100 text-teal-700 border-teal-200',
             'completed' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
             'cancelled' => 'bg-rose-100 text-rose-700 border-rose-200',
@@ -28,8 +32,8 @@
         $statusDotClass = match($statusRaw) {
             'pending' => 'bg-amber-500',
             'received' => 'bg-slate-500',
-            'washing' => 'bg-purple-600',
-            'drying' => 'bg-indigo-600',
+            'washing' => $isResting ? 'bg-amber-500' : 'bg-purple-600',
+            'drying' => $isFolding ? 'bg-teal-500' : 'bg-indigo-600',
             'ready_for_pickup', 'ready' => 'bg-teal-500',
             'completed' => 'bg-emerald-500',
             'cancelled' => 'bg-rose-500',
@@ -72,13 +76,16 @@
                 </h1>
             </div>
 
-            <!-- Quick Print Invoice -->
-            <button type="button" onclick="window.print()" class="flex h-10 items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs cursor-pointer">
-                <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>Print Invoice</span>
-            </button>
+            <div class="flex items-center gap-2.5">
+                @if($serviceRequest->status === 'completed')
+                    <a href="{{ route('customer.feedback', ['request_id' => $serviceRequest->id]) }}" class="flex h-10 items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 text-xs font-bold text-amber-800 hover:bg-amber-100 transition shadow-2xs">
+                        <svg class="h-4 w-4 text-amber-500 fill-current" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span>{{ $serviceRequest->feedbacks->count() ? 'Review Submitted' : 'Rate This Service' }}</span>
+                    </a>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -89,13 +96,13 @@
     <div class="mb-6 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm overflow-x-auto">
         <p class="text-xs font-mono uppercase font-bold tracking-wider text-slate-400 mb-4">Order Progress Stepper</p>
 
-        <div class="flex items-center justify-between min-w-[650px] relative px-4">
-            <!-- Background Line -->
-            <div class="absolute left-10 right-10 top-4 h-1 bg-slate-100 z-0"></div>
-            <div class="absolute left-10 top-4 h-1 bg-blue-600 z-0 transition-all duration-500" style="width: {{ max(0, min(100, ($stepIndex - 1) * 20)) }}%;"></div>
+        <div class="grid grid-cols-6 min-w-[650px] relative">
+            <!-- Background Line (from center of first dot to center of last dot) -->
+            <div class="absolute top-4 h-1 bg-slate-100 z-0" style="left: calc(100% / 12); right: calc(100% / 12);"></div>
+            <div class="absolute top-4 h-1 bg-blue-600 z-0 transition-all duration-500" style="left: calc(100% / 12); width: calc((100% - 100% / 6) * {{ max(0, min(100, ($stepIndex - 1) * 20)) }} / 100);"></div>
 
             <!-- Step 1: Pending -->
-            <div class="relative z-10 flex flex-col items-center">
+            <div class="relative z-10 flex flex-col items-center text-center">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full font-bold text-xs shadow-2xs transition {{ $stepIndex >= 1 ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                     1
                 </div>
@@ -104,7 +111,7 @@
             </div>
 
             <!-- Step 2: Received -->
-            <div class="relative z-10 flex flex-col items-center">
+            <div class="relative z-10 flex flex-col items-center text-center">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full font-bold text-xs shadow-2xs transition {{ $stepIndex >= 2 ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                     2
                 </div>
@@ -113,7 +120,7 @@
             </div>
 
             <!-- Step 3: Washing -->
-            <div class="relative z-10 flex flex-col items-center">
+            <div class="relative z-10 flex flex-col items-center text-center">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full font-bold text-xs shadow-2xs transition {{ $stepIndex >= 3 ? 'bg-purple-600 text-white shadow-purple-200' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                     3
                 </div>
@@ -122,7 +129,7 @@
             </div>
 
             <!-- Step 4: Drying -->
-            <div class="relative z-10 flex flex-col items-center">
+            <div class="relative z-10 flex flex-col items-center text-center">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full font-bold text-xs shadow-2xs transition {{ $stepIndex >= 4 ? 'bg-indigo-600 text-white shadow-indigo-200' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                     4
                 </div>
@@ -131,7 +138,7 @@
             </div>
 
             <!-- Step 5: Ready -->
-            <div class="relative z-10 flex flex-col items-center">
+            <div class="relative z-10 flex flex-col items-center text-center">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full font-bold text-xs shadow-2xs transition {{ $stepIndex >= 5 ? 'bg-teal-500 text-white shadow-teal-200' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                     5
                 </div>
@@ -140,7 +147,7 @@
             </div>
 
             <!-- Step 6: Completed -->
-            <div class="relative z-10 flex flex-col items-center">
+            <div class="relative z-10 flex flex-col items-center text-center">
                 <div class="flex h-9 w-9 items-center justify-center rounded-full font-bold text-xs shadow-2xs transition {{ $stepIndex >= 6 ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                     6
                 </div>
@@ -150,8 +157,77 @@
         </div>
     </div>
 
+    @if(in_array($serviceRequest->status, ['washing', 'drying']))
+        <!-- Customer Live Cycle Progress Card (Compact & Modern) -->
+        <div class="mb-5 rounded-2xl border {{ $cycle['phase'] === 'folding' ? 'border-teal-200/80 bg-gradient-to-br from-teal-50/60 via-white to-emerald-50/20' : ($cycle['phase'] === 'resting' ? 'border-amber-200/80 bg-gradient-to-br from-amber-50/60 via-white to-amber-50/20' : ($cycle['phase'] === 'drying' ? 'border-indigo-200/80 bg-gradient-to-br from-indigo-50/60 via-white to-indigo-50/20' : 'border-blue-200/80 bg-gradient-to-br from-blue-50/60 via-white to-blue-50/20')) }} p-4 sm:p-5 shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 mb-3 border-b {{ $cycle['phase'] === 'folding' ? 'border-teal-200/60' : ($cycle['phase'] === 'resting' ? 'border-amber-200/60' : ($cycle['phase'] === 'drying' ? 'border-indigo-100' : 'border-blue-100')) }}">
+                <div class="flex items-center gap-3">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider {{ $cycle['phase'] === 'folding' ? 'bg-teal-100 text-teal-800' : ($cycle['phase'] === 'resting' ? 'bg-amber-100 text-amber-800' : ($cycle['phase'] === 'drying' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800')) }}">
+                            <span class="h-1.5 w-1.5 rounded-full {{ $cycle['phase'] === 'folding' ? 'bg-teal-500' : ($cycle['phase'] === 'resting' ? 'bg-amber-500' : ($cycle['phase'] === 'drying' ? 'bg-indigo-600' : 'bg-blue-600')) }} animate-pulse"></span>
+                            <span>{{ $cycle['phase_label'] }}</span>
+                        </span>
+                        <h2 class="text-sm sm:text-base font-bold text-slate-900 mt-0.5">
+                            @if($cycle['phase'] === 'folding')
+                                Drying Complete · Folding &amp; Packaging
+                            @elseif($cycle['phase'] === 'resting')
+                                Wash Completed · Wash Buffer &amp; Transfer to Dryer
+                            @elseif($cycle['phase'] === 'drying')
+                                Drying Cycle in Progress
+                            @else
+                                Washing Cycle in Progress
+                            @endif
+                        </h2>
+                    </div>
+                </div>
+
+                @if($cycle['phase'] === 'folding')
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-teal-100 text-teal-800 font-mono text-xs font-bold border border-teal-200">
+                        <span>With Staff</span>
+                    </div>
+                @else
+                    <div class="flex items-baseline gap-2">
+                        <span id="custCycleTimerDisplay" class="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900">
+                            {{ $cycle['display_time'] }}
+                        </span>
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                            remaining
+                        </span>
+                    </div>
+                @endif
+            </div>
+
+            @if($cycle['phase'] === 'folding')
+                <!-- Folding Phase Information (No Timer) -->
+                <div class="rounded-xl bg-white/80 p-3 border border-teal-200/70 text-xs text-slate-600 leading-relaxed space-y-0.5">
+                    <p class="font-bold text-slate-800">Your laundry has finished drying!</p>
+                    <p class="text-[11px] text-slate-500">Our staff is now carefully folding and bagging your clothes. You will receive a notification as soon as it's ready for pickup.</p>
+                </div>
+            @else
+                <!-- Progress Bar -->
+                <div class="space-y-1.5">
+                    <div class="relative w-full h-2 rounded-full bg-slate-200/80 overflow-hidden shadow-inner">
+                        <div id="custCycleProgressBar" class="h-full rounded-full transition-all duration-1000 {{ $cycle['phase'] === 'resting' ? 'bg-gradient-to-r from-amber-400 to-amber-500' : ($cycle['phase'] === 'drying' ? 'bg-gradient-to-r from-indigo-500 to-purple-600' : 'bg-gradient-to-r from-blue-500 to-indigo-600') }}" style="width: {{ $cycle['percentage'] }}%;"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px] font-mono text-slate-500">
+                        <span>
+                            @if($cycle['phase'] === 'resting')
+                                Wash cool-down &amp; transfer buffer
+                            @elseif($cycle['phase'] === 'drying')
+                                Assigned to {{ $serviceRequest->dryerMachine->name ?? 'Dryer' }}
+                            @else
+                                Assigned to {{ $serviceRequest->washingMachine->name ?? 'Washer' }}
+                            @endif
+                        </span>
+                        <span>Live status auto-updates</span>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <!-- Weight & Count Verification Status Banner (If applicable) -->
-    @if(!$serviceRequest->clothType->requires_size && $serviceRequest->weight_verification_status === 'correct')
+    @if($serviceRequest->weight_verification_status === 'correct')
         <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 shadow-2xs flex items-start gap-3">
             <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white font-bold text-xs">✓</span>
             <div>
@@ -161,7 +237,7 @@
                 </p>
             </div>
         </div>
-    @elseif(!$serviceRequest->clothType->requires_size && $serviceRequest->weight_verification_status === 'incorrect')
+    @elseif($serviceRequest->weight_verification_status === 'incorrect')
         <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 shadow-2xs flex items-start gap-3">
             <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white font-bold text-xs">!</span>
             <div>
@@ -175,7 +251,7 @@
 
     <!-- Main Grid Layout -->
     <div class="grid gap-6 lg:grid-cols-3">
-        <!-- Left Side: Laundry Specifications Card (Spans 2 columns) -->
+        <!-- Left Side: Laundry Details Card (Spans 2 columns) -->
         <div class="lg:col-span-2 space-y-6">
             <div class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-sm">
                 <div class="absolute top-0 inset-x-0 h-1.5 bg-blue-600"></div>
@@ -187,7 +263,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold tracking-tight text-slate-900">Laundry Specifications</h2>
+                        <h2 class="text-xl font-bold tracking-tight text-slate-900">Laundry Details</h2>
                         <p class="text-xs font-medium text-slate-400">Full details of your service package and add-ons.</p>
                     </div>
                 </div>
@@ -206,7 +282,15 @@
                     @if($serviceRequest->comforter_size)
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
                             <dt class="font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-400">Comforter Size</dt>
-                            <dd class="text-base font-bold text-purple-700 mt-1">{{ $serviceRequest->comforter_size }}</dd>
+                            <dd class="text-base font-bold text-purple-700 mt-1">
+                                {{ $serviceRequest->comforter_size }}
+                                @php
+                                    $dWeight = $serviceRequest->actual_weight ?? $serviceRequest->estimated_weight;
+                                @endphp
+                                @if($dWeight && $dWeight > 0)
+                                    <span class="text-xs font-bold text-slate-500 font-mono">({{ ($dWeight + 0) }} kg{{ $serviceRequest->actual_weight ? ' verified' : '' }})</span>
+                                @endif
+                            </dd>
                         </div>
                     @else
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
@@ -230,6 +314,81 @@
                         </dd>
                     </div>
                 </dl>
+
+                @if($serviceRequest->items->count() > 0)
+                    <!-- Itemized Clothing Checklist Card -->
+                    <div class="mt-5 pt-4 border-t border-slate-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="h-2 w-2 rounded-full bg-blue-500"></span>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">Itemized Cloth Checklist</h3>
+                                <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-extrabold text-blue-700 font-mono">{{ $serviceRequest->items->count() }} items</span>
+                            </div>
+                            <span class="text-[11px] font-mono text-slate-400">Anti-Loss Protection</span>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-slate-50/50">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 bg-slate-100/70 font-mono text-[10px] uppercase font-bold text-slate-500">
+                                        <th class="py-2.5 px-3">Item Type</th>
+                                        <th class="py-2.5 px-3 text-center">Submitted Count</th>
+                                        <th class="py-2.5 px-3 text-center">Store Verified</th>
+                                        <th class="py-2.5 px-3 text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 bg-white">
+                                    @foreach($serviceRequest->items as $item)
+                                        @php
+                                            $isVerified = ($item->verified_qty !== null);
+                                            $isMatch = $item->isVerifiedMatch();
+                                            $diff = $isVerified ? ($item->verified_qty - $item->declared_qty) : 0;
+                                        @endphp
+                                        <tr class="hover:bg-slate-50/60 transition">
+                                            <td class="py-2.5 px-3 font-semibold text-slate-800">
+                                                {{ $item->item_name }}
+                                                @if($item->declared_qty === 0)
+                                                    <span class="ml-1 rounded bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 border border-amber-200">Discovered</span>
+                                                @elseif($item->is_custom)
+                                                    <span class="ml-1 rounded bg-purple-50 px-1.5 py-0.5 text-[9px] font-bold text-purple-700 border border-purple-200">Other</span>
+                                                @endif
+                                            </td>
+                                            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-600">
+                                                @if($item->declared_qty === 0)
+                                                    <span class="text-slate-400 italic font-normal text-[11px]">None</span>
+                                                @else
+                                                    {{ $item->declared_qty }} pcs
+                                                @endif
+                                            </td>
+                                            <td class="py-2.5 px-3 text-center font-mono font-bold {{ $isVerified ? ($isMatch ? 'text-emerald-700' : 'text-amber-700') : 'text-slate-400' }}">
+                                                {{ $isVerified ? $item->verified_qty . ' pcs' : 'Pending' }}
+                                            </td>
+                                            <td class="py-2.5 px-3 text-right">
+                                                @if(!$isVerified)
+                                                    <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                                                        Pending Check
+                                                    </span>
+                                                @elseif($item->declared_qty === 0)
+                                                    <span class="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">
+                                                        <span>+</span> {{ $item->verified_qty }} pcs extra
+                                                    </span>
+                                                @elseif($isMatch)
+                                                    <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                                                        <span>✓</span> Verified
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+                                                        <span>⚠</span> {{ $diff > 0 ? "+{$diff} extra" : "{$diff} missing" }}
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Add-ons Section -->
                 <div class="mt-5 pt-4 border-t border-slate-100">
@@ -318,6 +477,158 @@
                     </div>
                 @endif
             </div>
+
+            @if($serviceRequest->feedbacks->isNotEmpty())
+                <!-- Customer Submitted Feedback Card -->
+                <div class="rounded-3xl border border-amber-200/80 bg-amber-50/40 p-6 shadow-xs">
+                    <div class="flex items-center justify-between pb-3 border-b border-amber-200/60 mb-3">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                            <svg class="h-4 w-4 text-amber-500 fill-current" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span>Your Service Review</span>
+                        </h3>
+                        <span class="text-xs font-mono font-bold text-amber-800">
+                            {{ $serviceRequest->feedbacks->first()->rating }}.0 / 5.0
+                        </span>
+                    </div>
+                    @php $firstFb = $serviceRequest->feedbacks->first(); @endphp
+                    @if($firstFb->subject)
+                        <p class="text-xs font-bold text-slate-800 break-words break-all">{{ $firstFb->subject }}</p>
+                    @endif
+                    @if($firstFb->comment)
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed break-words break-all">{{ $firstFb->comment }}</p>
+                    @endif
+                    @if(!empty($firstFb->aspects))
+                        <div class="mt-2.5 flex flex-wrap gap-1">
+                            @foreach($firstFb->aspects as $asp)
+                                <span class="rounded-lg bg-white/80 border border-amber-200 px-2 py-0.5 text-[10px] font-medium text-amber-900">
+                                    {{ $asp }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @endif
+                    <p class="text-[10px] font-mono text-slate-400 mt-3 pt-2 border-t border-amber-200/50">
+                        Submitted {{ $firstFb->created_at->format('M d, Y · h:i A') }}
+                    </p>
+                </div>
+            @endif
         </div>
     </div>
+
+    <!-- Real-time Laundry Tracker Sync & Countdown Script -->
+    <script>
+        (function() {
+            const currentReqId = '{{ $serviceRequest->id }}';
+            let currentStatus = '{{ $serviceRequest->status }}';
+            let currentPhase = '{{ $serviceRequest->cycle_phase }}';
+            let currentWeightVerification = '{{ $serviceRequest->weight_verification_status }}';
+            let remainingSeconds = {{ (int) ($cycle['remaining_seconds'] ?? 0) }};
+            let totalSeconds = {{ (int) ($cycle['total_seconds'] ?? 0) }};
+            const timerDisplay = document.getElementById('custCycleTimerDisplay');
+            const progressBar = document.getElementById('custCycleProgressBar');
+            let isReloading = false;
+            let syncInterval = null;
+
+            function triggerReload() {
+                if (isReloading) return;
+                isReloading = true;
+                sessionStorage.setItem('spinzone_tracker_scroll', window.scrollY);
+                window.location.reload();
+            }
+
+            function formatTime(sec) {
+                const m = Math.floor(sec / 60);
+                const s = sec % 60;
+                return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+            }
+
+            // 1. Live Countdown Timer (if washing or drying)
+            if (remainingSeconds > 0) {
+                const countdownInterval = setInterval(function() {
+                    remainingSeconds--;
+                    if (remainingSeconds < 0) remainingSeconds = 0;
+
+                    if (timerDisplay) timerDisplay.textContent = formatTime(remainingSeconds);
+                    if (progressBar && totalSeconds > 0) {
+                        const pct = Math.min(100, Math.round(((totalSeconds - remainingSeconds) / totalSeconds) * 100));
+                        progressBar.style.width = pct + '%';
+                    }
+
+                    if (remainingSeconds <= 0) {
+                        clearInterval(countdownInterval);
+                        checkStatus();
+                    }
+                }, 1000);
+            }
+
+            // 2. Real-time Background Status Check
+            function checkStatus() {
+                if (isReloading) return;
+                fetch('{{ route('customer.requests.cycle-sync', $serviceRequest) }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || !data.success) return;
+
+                    // If status, cycle phase, or weight verification changed, reload immediately!
+                    if (data.changed || 
+                        data.status !== currentStatus || 
+                        data.cycle_phase !== currentPhase || 
+                        (data.weight_verification_status || '') !== (currentWeightVerification || '')) {
+                        triggerReload();
+                        return;
+                    }
+
+                    // Synchronize timer drift if active
+                    if (data.info && typeof data.info.remaining_seconds === 'number' && remainingSeconds > 0) {
+                        const srvRemaining = data.info.remaining_seconds;
+                        if (Math.abs(srvRemaining - remainingSeconds) > 2) {
+                            remainingSeconds = srvRemaining;
+                            if (timerDisplay) timerDisplay.textContent = formatTime(remainingSeconds);
+                        }
+                    }
+                })
+                .catch(() => {});
+            }
+
+            // Check every 5 seconds if not yet completed or cancelled
+            if (currentStatus !== 'completed' && currentStatus !== 'cancelled') {
+                syncInterval = setInterval(checkStatus, 5000);
+            }
+
+            // Check immediately when tab regains focus or visibility
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && currentStatus !== 'completed' && currentStatus !== 'cancelled') {
+                    checkStatus();
+                }
+            });
+            window.addEventListener('focus', function() {
+                if (currentStatus !== 'completed' && currentStatus !== 'cancelled') {
+                    checkStatus();
+                }
+            });
+
+            // 3. Listen to global real-time event from notification poller
+            window.addEventListener('spinzone:tracker-sync', function(e) {
+                if (isReloading) return;
+                const activeList = (e.detail && e.detail.activeRequests) || [];
+                const found = activeList.find(r => String(r.id) === String(currentReqId));
+                if (found) {
+                    if (found.status !== currentStatus || 
+                        found.cycle_phase !== currentPhase || 
+                        (found.weight_verification_status || '') !== (currentWeightVerification || '')) {
+                        triggerReload();
+                    }
+                } else if (currentStatus !== 'completed' && currentStatus !== 'cancelled') {
+                    // It was active and is no longer in active requests -> order was completed or cancelled!
+                    triggerReload();
+                }
+            });
+        })();
+    </script>
 </x-customer-layout>
